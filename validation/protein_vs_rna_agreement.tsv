@@ -1,0 +1,7 @@
+rna_cohort	protein_list	measured	same_direction	pct	same_and_sig	spearman_all	n_all
+TCGA-KIRC RNA (24 pairs)	Higher in tumour (protein)	219	208	95.0			
+TCGA-KIRC RNA (24 pairs)	Lower in tumour (protein)	591	544	92.0			
+TCGA-KIRC RNA (24 pairs)	All 860 changed proteins	810	752	92.8	680.0	0.66	8398.0
+GSE102101 RNA (10 pairs)	Higher in tumour (protein)	223	206	92.4			
+GSE102101 RNA (10 pairs)	Lower in tumour (protein)	604	575	95.2			
+GSE102101 RNA (10 pairs)	All 860 changed proteins	827	781	94.4	694.0	0.704	8492.0

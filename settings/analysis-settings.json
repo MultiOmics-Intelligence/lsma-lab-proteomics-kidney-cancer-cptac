@@ -1,0 +1,112 @@
+{
+  "workflow": "proteomics",
+  "workflow_version": "1.0.0",
+  "random_seed": 42,
+  "lab_run_time": "2 min 40 s (import of 160 samples from the PDC: 15 s)",
+  "parameters": {
+    "input": {
+      "sample_preparation": {
+        "version": 1,
+        "condition": "tissue",
+        "relabel": {},
+        "groups": [
+          "normal",
+          "tumour"
+        ],
+        "reference": "normal",
+        "excluded": {
+          "CPT0017850003": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC",
+          "CPT0079180003": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC",
+          "CPT0078660003": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC",
+          "CPT0018250001": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC",
+          "CPT0012770003": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC",
+          "CPT0078670001": "Non-clear-cell renal cell carcinoma: this analysis is about clear cell RCC"
+        },
+        "covariates": [
+          "patient"
+        ],
+        "pairing": "patient"
+      }
+    },
+    "qc": {
+      "min_valid_fraction": 0.66,
+      "group_column": null,
+      "outlier_mad": 3
+    },
+    "normalisation": {
+      "method": "median",
+      "imputation": "minprob",
+      "minprob_quantile": 0.01
+    },
+    "exploration": {
+      "color_by": null,
+      "n_top_proteins": 500,
+      "n_heatmap_proteins": 50,
+      "linkage": "complete"
+    },
+    "differential_abundance": {
+      "group_column": "tissue",
+      "test_level": "tumour",
+      "reference_level": "normal",
+      "covariates": [
+        "patient"
+      ],
+      "alpha": 0.05,
+      "lfc_threshold": 1,
+      "trend": true,
+      "robust": false,
+      "p_adjust_method": "BH"
+    },
+    "enrichment": {
+      "enabled": true,
+      "collections": [
+        "hallmark",
+        "go_bp",
+        "go_cc"
+      ],
+      "run_ora": true,
+      "run_gsea": true,
+      "padj_cutoff": null,
+      "lfc_cutoff": null,
+      "min_set_size": 10,
+      "max_set_size": 500
+    }
+  },
+  "software_versions": {
+    "input": {
+      "R": "4.5.2",
+      "data.table": "1.18.6.1",
+      "jsonlite": "2.0.0",
+      "Bioconductor": "3.21"
+    },
+    "qc": {
+      "R": "4.5.2",
+      "jsonlite": "2.0.0",
+      "Bioconductor": "3.21"
+    },
+    "normalisation": {
+      "R": "4.5.2",
+      "limma": "3.64.3",
+      "imputeLCMD": "2.1",
+      "impute": "1.82.0",
+      "Bioconductor": "3.21"
+    },
+    "exploration": {
+      "R": "4.5.2",
+      "jsonlite": "2.0.0",
+      "Bioconductor": "3.21"
+    },
+    "differential_abundance": {
+      "R": "4.5.2",
+      "limma": "3.64.3",
+      "Bioconductor": "3.21"
+    },
+    "enrichment": {
+      "R": "4.5.2",
+      "clusterProfiler": "4.16.0",
+      "fgsea": "1.34.2",
+      "msigdbr": "26.1.1",
+      "Bioconductor": "3.21"
+    }
+  }
+}
