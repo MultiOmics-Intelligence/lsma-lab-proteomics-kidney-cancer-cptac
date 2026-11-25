@@ -171,6 +171,74 @@ Every step below is a stage in the LSMA Analysis Lab, run with the settings in [
 
 **Software:** R 4.5.2 and Bioconductor 3.21, with limma, imputeLCMD, clusterProfiler, fgsea and msigdbr, in the versions listed in the settings file.
 
+## The mathematics behind the methods
+
+The standard forms of the methods used above, as the lab's code applies them. Protein $g$, sample $j$; all values are log2 ratios to the pooled reference.
+
+**Median centring.**
+
+$$
+y'_{gj} = y_{gj} - m_j + \bar m, \qquad m_j = \operatorname{median}_{g}   y_{gj}, \qquad \bar m = \frac{1}{n} \sum_{k=1}^{n} m_k
+$$
+
+Each of the $n$ samples is shifted so that its median equals the mean of all sample medians. On the log scale this removes differences in overall loading between samples.
+
+**MinProb imputation.**
+
+$$
+y'_{gj} \sim \mathcal{N}\left( q_j, \sigma^2 \right) \quad \text{for each missing value}, \qquad q_j = \text{the 1st percentile of sample } j
+$$
+
+A missing value is taken to mean "too low to measure", so it is drawn at random from a narrow normal distribution at the low end of that sample. imputeLCMD sets $\sigma$ from the proteins' typical standard deviation (`tune.sigma = 1`). This filled in 2% of the kept values.
+
+**Linear model with the paired design (`~ patient + tissue`).**
+
+$$
+y'_{gj} = \beta_{g0} + \gamma_{g,p(j)} + \beta_{g1} x_j + \varepsilon_{gj}, \qquad \varepsilon_{gj} \sim \mathcal{N}(0, \sigma_g^2)
+$$
+
+$x_j$ is 1 for a tumour and 0 for normal kidney, and $\gamma_{g,p(j)}$ is the effect of the patient $p(j)$. So $\beta_{g1}$ is the log2 fold change of tumour over normal within the same patient. (The code fits one mean per tissue plus the patient terms and takes the contrast tumour − normal, which gives the same estimate.)
+
+**limma moderated t-statistic, with an intensity trend.**
+
+$$
+\tilde t_g = \frac{\hat\beta_{g1}}{\tilde s_g \sqrt{v_g}}, \qquad \tilde s_g^2 = \frac{d_0 s_0^2 + d_g s_g^2}{d_0 + d_g}
+$$
+
+$s_g^2$ is the protein's residual variance on $d_g$ degrees of freedom, and $v_g$ the unscaled variance of the contrast from the design. Empirical Bayes estimates a prior variance $s_0^2$ on $d_0$ degrees of freedom from all proteins; with `trend = TRUE`, $s_0^2$ follows the protein's average intensity. $\tilde t_g$ is compared with a t distribution on $d_0 + d_g$ degrees of freedom, and is also the score used to rank proteins for GSEA.
+
+**Benjamini–Hochberg adjustment.**
+
+$$
+p^{\text{adj}}_{(k)} = \min_{l \ge k}   \min\left( 1, \frac{m   p_{(l)}}{l} \right)
+$$
+
+$p_{(1)} \le \dots \le p_{(m)}$ are the sorted p-values of the $m$ proteins tested. Calling proteins at adjusted p < 0.05 keeps the expected share of false discoveries at 5%. The same adjustment is applied across gene sets in the enrichment.
+
+**Over-representation analysis (hypergeometric test).**
+
+$$
+P(X \ge k) = \sum_{x=k}^{\min(n, M)} \frac{\binom{M}{x} \binom{N-M}{n-x}}{\binom{N}{n}}
+$$
+
+$N$ is the number of background genes (all tested proteins) found in the collection, $M$ of them belong to the gene set, $n$ is the number in the list, and $k$ the number in both. Proteins higher and lower in the tumour (adjusted p < 0.05, |log2 fold change| ≥ 1) are tested as separate lists.
+
+**Gene set enrichment analysis (fgsea).**
+
+$$
+P_{\text{hit}}(k) = \sum_{g_j \in S,\ j \le k} \frac{\lvert r_j \rvert}{N_R}, \qquad P_{\text{miss}}(k) = \sum_{g_j \notin S,\ j \le k} \frac{1}{N - N_S}, \qquad N_R = \sum_{g_j \in S} \lvert r_j \rvert
+$$
+
+All $N$ tested proteins are sorted by the moderated t-statistic $r_j$, and $S$ is a gene set of $N_S$ genes. Walking down the list, the enrichment score ES is the value of $P_{\text{hit}}(k) - P_{\text{miss}}(k)$ furthest from zero. NES divides ES by the mean score of random sets of the same size and the same sign; p-values come from fgsea's multilevel permutation method.
+
+**Spearman correlation (validation).**
+
+$$
+\rho = \operatorname{corr}\left( \operatorname{rank}(x), \operatorname{rank}(y) \right)
+$$
+
+The correlation of the ranks of the protein fold changes $x$ and the RNA fold changes $y$ of the same genes. It measures agreement in order, without assuming a straight-line relation.
+
 ---
 
 ## Validation
