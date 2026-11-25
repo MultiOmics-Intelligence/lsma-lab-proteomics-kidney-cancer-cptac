@@ -178,7 +178,7 @@ The standard forms of the methods used above, as the lab's code applies them. Pr
 **Median centring.**
 
 $$
-y'_{gj} = y_{gj} - m_j + \bar m, \qquad m_j = \operatorname{median}_{g}   y_{gj}, \qquad \bar m = \frac{1}{n} \sum_{k=1}^{n} m_k
+y'_{gj} = y_{gj} - m_j + \bar m, \qquad m_j = \mathrm{median}_{g}   y_{gj}, \qquad \bar m = \frac{1}{n} \sum_{k=1}^{n} m_k
 $$
 
 Each of the $n$ samples is shifted so that its median equals the mean of all sample medians. On the log scale this removes differences in overall loading between samples.
@@ -234,7 +234,7 @@ All $N$ tested proteins are sorted by the moderated t-statistic $r_j$, and $S$ i
 **Spearman correlation (validation).**
 
 $$
-\rho = \operatorname{corr}\left( \operatorname{rank}(x), \operatorname{rank}(y) \right)
+\rho = \mathrm{corr}\left( \mathrm{rank}(x), \mathrm{rank}(y) \right)
 $$
 
 The correlation of the ranks of the protein fold changes $x$ and the RNA fold changes $y$ of the same genes. It measures agreement in order, without assuming a straight-line relation.
